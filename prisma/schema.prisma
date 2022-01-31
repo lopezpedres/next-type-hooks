@@ -10,11 +10,68 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
+model user {
   id String @id @default(uuid())
   name String
   lastname String
   admin Boolean
-  birthday DateTime ?
 
 }
+
+//Here I create the model Contact that can be either a customer or a supplier
+model Contact {
+  id String @id @default(uuid())
+  name String
+  type typeContact
+
+  }
+
+enum typeContact {
+  provider
+  customer
+    }
+
+
+model supplier{
+   id String @id @default(uuid())
+   name String
+   ingredients ingredients[]
+}
+//Creating Model for the products with its respective ingredients
+//The relationship between them is a many to many
+//I want to be able to do a traceback, ingredients from products and products from ingredients
+
+
+//Products Model
+model product {
+  id String @id @default(uuid())
+  name String
+  quantity Int
+  productIngredients productIngredients[]
+
+}
+
+//Ingredients Model
+model ingredients{
+  id String @id @default(uuid())
+  name String
+  quantity Int
+  supplierId String
+  supplier supplier @relation(fields:[supplierId ], references:[id])
+
+  // provider// if I add this in another table then I will be using a one-one relationship OR maybe I can do a one-many, having ONE suplier with MANY ingredients 
+  productIngredients productIngredients[]
+  
+
+}
+
+//Intermediary Model between Products and Ingredients
+model productIngredients {
+  ingredientId String
+  ingredients ingredients @relation(fields:[ingredientId], references: [id])
+  productId String
+  product product @relation(fields:[productId], references: [id])
+
+  @@id([ingredientId,productId])
+}
+
