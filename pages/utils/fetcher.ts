@@ -1,7 +1,7 @@
 require("isomorphic-fetch");
-export const fetcher = async (url: RequestInfo, data:TUser) => {
+export const fetcher = async (url: RequestInfo, data?:TUser) => {
     const response = await fetch(url, {
-      method: "POST", // *GET, POST, PUT, DELETE, etc.
+      method: data? "POST": "GET", // *GET, POST, PUT, DELETE, etc.
       headers: {
         "Content-Type": "application/json",
       },
