@@ -7,7 +7,7 @@ export default async function  (request:NextApiRequest, response:NextApiResponse
       if(request.method==="GET"){
         const allUsers = await prisma.user.findMany()
       response.status(200).json(allUsers)
-      console.log("Reetrived users from database using Prisma")
+      console.log("Retrived users from database using Prisma")
       }
       if(request.method==="POST"){
         const newUser = await prisma.user.create({

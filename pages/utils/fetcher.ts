@@ -1,5 +1,5 @@
 require("isomorphic-fetch");
-export const fetcher = async (url: RequestInfo, data?:TUser) => {
+export const fetcher = async (url: RequestInfo, data?:TUser|TSupplier|TIngredient) => {
     const response = await fetch(url, {
       method: data? "POST": "GET", // *GET, POST, PUT, DELETE, etc.
       headers: {

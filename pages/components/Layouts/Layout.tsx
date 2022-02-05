@@ -1,6 +1,6 @@
 import React from 'react';
-import { Navbar } from '../components/Navbar';
-import users from "../data/data"
+import { Navbar } from '../Navbar/Navbar';
+import users from "../../data/data"
 
 const usersArray = (users:Record<TUserId,TUser>)=>{
   const allUsersArray = Object.values(users)
