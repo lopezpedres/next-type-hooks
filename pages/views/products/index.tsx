@@ -6,7 +6,7 @@ import { fetcher } from "../../utils/fetcher";
 //   quantity: number
 //   supplierId: string
 
-// } 
+// }  
 
 //EVERYTHING TO DOOOOOOOOOOOOO
 
