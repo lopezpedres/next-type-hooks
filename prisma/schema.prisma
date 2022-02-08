@@ -75,7 +75,11 @@ model productIngredients {
   ingredients ingredients @relation(fields:[ingredientId], references: [id])
   productId String
   product product @relation(fields:[productId], references: [id])
-  quantity Int
+  //Here I am storing the amount of ingredients used per product
+  // For example: I I created 1 chocolate bar, I had to use 1 chocolate, 1 milk and 1 wrap
+  // The quantity of my ingredients in the Ingredients table needs to change when a product is created, to
+  // keep up to date the ingredients inventory.
+  quantityOfIngredientsUsed Int
 
   @@id([ingredientId,productId])
 }
