@@ -50,6 +50,7 @@ model product {
   id String @id @default(uuid())
   name String
   quantity Int
+  createdAt DateTime @default(now())
   productIngredients productIngredients[]
 
 }
@@ -74,6 +75,7 @@ model productIngredients {
   ingredients ingredients @relation(fields:[ingredientId], references: [id])
   productId String
   product product @relation(fields:[productId], references: [id])
+  quantity Int
 
   @@id([ingredientId,productId])
 }
