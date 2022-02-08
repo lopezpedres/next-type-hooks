@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { fetcher } from "../../utils/fetcher";
 
-interface TForm{
+interface TFormIngredients{
   name: string
   quantity: number
   supplierId: string
 
 }
 
-const InitialFormIngredient:TForm = {
+const InitialFormIngredient:TFormIngredients = {
   name: "",
   quantity: 0,
   supplierId: "",
@@ -24,7 +24,7 @@ const Users: React.FC = () => {
 
   //Here I store my suppliers
   const [suppliers, setSuppliers] = useState<TSuppliers>([]);
-  //Here I deconstructec the
+  //Here I deconstructec the form 
   const { name, quantity, supplierId } = newFormIngredient;
 
   //Getting Suppliers when Loading the page
@@ -33,7 +33,6 @@ const Users: React.FC = () => {
     const usersHandler = async () => {
       const suppliersFetcher = await fetcher("/api/suppliers");
       setSuppliers(suppliersFetcher);
-      return usersHandler;
     };
     usersHandler();
   }, []);
