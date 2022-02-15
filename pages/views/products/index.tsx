@@ -1,78 +1,89 @@
 import React, { useEffect, useState } from "react";
+import ProductIngredients from "../../components/Product/ProductIngredients";
 import { fetcher } from "../../utils/fetcher";
 
-// interface TFormOrders{
-//   name: string
-//   quantity: number
-//   supplierId: string
+interface ProductForm {
+  name: string;
+  quantity: number;
+}
 
-// }  
 
-//EVERYTHING TO DOOOOOOOOOOOOO
-
-const InitialFormProduct= {
+const InitialFormProduct: ProductForm = {
   name: "",
   quantity: 0,
-  supplierId: "",
 };
 
-const Users: React.FC = () => {
-  //Here I save all  my Ingredients
-  const [ingredients, setIngredient] = useState<TIngredient[]>([]);
+const Products = () => {
+  //These is the array that I am going to be reciving in the props
+
+  const [ingredientsQuantityList, setTngredientsQuantityList] = useState<
+    ProductIngredients[]
+  >([]);
+  //There is the state i am going to be using to change the structure of my
+  //ingredientsQuantityList for the Porduct Payload
+  const [ingredientsQuantityPayload, setIngredientsQuantityPayload] = useState<
+    IngredientsQuantityPayload[]
+  >([]);
+
+  //Here I save all  my Products that come from the database
+  const [products, setProducts] = useState<TProduct[]>([]);
   // Here I handle the Form info
-  const [newFormIngredient, setNewFormIngredient] = useState<TIngredient>(
-    InitialFormIngredient
-  );
+  const [newFormProduct, setNewFormProduct] =
+    useState<ProductForm>(InitialFormProduct);
 
-  //Here I store my suppliers
-  const [suppliers, setSuppliers] = useState<TSuppliers>([]);
-  //Here I deconstructec the
-  const { name, quantity, supplierId } = newFormIngredient;
+  //Here I deconstruct the product object
+  const { name, quantity } = newFormProduct;
 
-  //Getting Suppliers when Loading the page
-  useEffect(() => {
-    console.log("Using UseEffect")
-    const usersHandler = async () => {
-      const suppliersFetcher = await fetcher("/api/suppliers");
-      setSuppliers(suppliersFetcher);
-    };
-    usersHandler();
-  }, []);
-
-  // Getting the Ingredients
-  const usersHandler = async () => {
-    const ingredients = await fetcher("/api/ingredients");
-    setIngredient(ingredients);
+  // Getting the Products
+  const productHandler = async () => {
+    const product = await fetcher("/api/products");
+    setProducts(product);
   };
   // Handeling Form Submit
-  const newUserHandler = async (event: React.FormEvent<HTMLFormElement>) => {
+  const newProductHandler = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    //Eventually I need to create a type for this object so It can be accepted by the fetcher and then remove the any in the fetcher function
+    const payload = {
+      name,
+      quantity,
+      productIngredients: {
+        create: ingredientsQuantityPayload,
+      },
+    };
 
-    await fetcher("/api/ingredients", newFormIngredient);
-    console.log("New Ingredient has been added from the index");
-    setNewFormIngredient(InitialFormIngredient);
+    await fetcher("/api/products", payload);
+    console.log("New Product has been added from the index");
+    setNewFormProduct(InitialFormProduct);
   };
 
   const onChangeHandler = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ): void => {
     const changedFormValues = {
-      ...newFormIngredient,
-      [event.target.name]: event.target.type==="number"? parseInt(event.target.value)  :event.target.value
+      ...newFormProduct,
+      [event.target.name]:
+        event.target.type === "number"
+          ? parseInt(event.target.value)
+          : event.target.value,
     };
-    setNewFormIngredient(changedFormValues);
-    console.log(typeof(changedFormValues.quantity))
+    setNewFormProduct(changedFormValues);
   };
   return (
     <div>
-      <button onClick={() => usersHandler()}>GET ALL INGREDIENTS</button>
+      <button onClick={() => productHandler()}>GET ALL PRODUCTS</button>
       <ul>
-        {ingredients.map((ingredient) => (
-          <li key={ingredient.name}>{ingredient.name}</li>
-        ))}
+        {products.length !== 0 ? (
+          products.map((product) => (
+            <li key={product.name}>
+              Product Name: {product.name} - Quantity: {product.quantity}
+            </li>
+          ))
+        ) : (
+          <p>There are no products to show</p>
+        )}
       </ul>
-      <form onSubmit={newUserHandler}>
+      <form onSubmit={newProductHandler}>
         <input
           name="name"
           value={name}
@@ -88,21 +99,16 @@ const Users: React.FC = () => {
           onChange={onChangeHandler}
         ></input>
         <br />
-        <select
-        name="supplierId"
-        value={supplierId}
-          onChange={onChangeHandler}
-        >
-          {suppliers.map((supplier) => (
-            <option key = {supplier.name}value={supplier.id}>{supplier.name}</option>
-          ))}
-        </select>
-        <br />
-        <button>Add new Ingredient</button>
+        <button>Add new Product</button>
       </form>
+      <ProductIngredients
+        ingredientsQuantityList={ingredientsQuantityList}
+        setTngredientsQuantityList={setTngredientsQuantityList}
+        ingredientsQuantityPayload ={ingredientsQuantityPayload}
+        setIngredientsQuantityPayload={setIngredientsQuantityPayload}
+      />
     </div>
   );
 };
 
-export default Users;
-
+export default Products;

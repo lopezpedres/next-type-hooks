@@ -51,7 +51,7 @@ model product {
   name String
   quantity Int
   createdAt DateTime @default(now())
-  productIngredients productIngredients[]
+  productIngredients productIngredients[] 
 
 }
 
