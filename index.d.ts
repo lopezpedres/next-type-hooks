@@ -41,7 +41,7 @@ type TProduct = {
 };
 
 //Mean to be used for the list of ingredients of a product
-interface ProductIngredients {
+type ProductIngredients= {
   quantity: number;
   ingredientId: TIngredientId;
 }
@@ -54,4 +54,15 @@ interface IngredientsQuantityPayload {
       id: string;
     };
   };
+}
+
+type ProductIngredientsState = {
+  quantity: number;
+  ingredientId: TIngredientId;
+}
+
+ type ProductIngredientAction = {
+  type: 'edit' | 'remove'|'add'
+  IngredientId: TIngredientId
+  quantity: number
 }

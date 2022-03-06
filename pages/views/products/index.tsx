@@ -7,7 +7,6 @@ interface ProductForm {
   quantity: number;
 }
 
-
 const InitialFormProduct: ProductForm = {
   name: "",
   quantity: 0,
@@ -15,7 +14,6 @@ const InitialFormProduct: ProductForm = {
 
 const Products = () => {
   //These is the array that I am going to be reciving in the props
-
   const [ingredientsQuantityList, setTngredientsQuantityList] = useState<
     ProductIngredients[]
   >([]);
@@ -104,7 +102,7 @@ const Products = () => {
       <ProductIngredients
         ingredientsQuantityList={ingredientsQuantityList}
         setTngredientsQuantityList={setTngredientsQuantityList}
-        ingredientsQuantityPayload ={ingredientsQuantityPayload}
+        ingredientsQuantityPayload={ingredientsQuantityPayload}
         setIngredientsQuantityPayload={setIngredientsQuantityPayload}
       />
     </div>

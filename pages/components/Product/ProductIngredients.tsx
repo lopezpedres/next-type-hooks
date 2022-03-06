@@ -1,129 +1,157 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useReducer } from "react";
 import { fetcher } from "../../utils/fetcher";
+import ProductIngredientsReducer from "./ProductIngredientsReducer";
 
-
-interface ProductProps{
-  ingredientsQuantityList: ProductIngredients[]
-  setTngredientsQuantityList: React.Dispatch<React.SetStateAction<ProductIngredients[]>>
-  ingredientsQuantityPayload:IngredientsQuantityPayload[]
-  setIngredientsQuantityPayload:React.Dispatch<React.SetStateAction<IngredientsQuantityPayload[]>>
+interface ProductProps {
+  ingredientsQuantityList: ProductIngredients[];
+  setTngredientsQuantityList: React.Dispatch<
+    React.SetStateAction<ProductIngredients[]>
+  >;
+  ingredientsQuantityPayload: IngredientsQuantityPayload[];
+  setIngredientsQuantityPayload: React.Dispatch<
+    React.SetStateAction<IngredientsQuantityPayload[]>
+  >;
 }
 
-
-
-const InitialFormProduct:ProductIngredients = {
-  quantity:0,
-  ingredientId: ""
+const InitialFormProduct: ProductIngredients = {
+  quantity: 0,
+  ingredientId: "",
 };
 
-const ProductIngredients= ({ingredientsQuantityList, ingredientsQuantityPayload, setTngredientsQuantityList,setIngredientsQuantityPayload}:ProductProps) => {
+const ProductIngredients = ({
+  ingredientsQuantityList,
+  ingredientsQuantityPayload,
+  setTngredientsQuantityList,
+  setIngredientsQuantityPayload,
+}: ProductProps) => {
+  //Here I store the state of my form and then deconstruct the object
+  const [newFormProduct, setNewFormProduct] = useState<ProductIngredients>(InitialFormProduct);
 
-  const [newFormProduct, setNewFormProduct] = useState<ProductIngredients>(
-    InitialFormProduct
-  );
-
-  //Here I store the list of ingredients with its corresponding quantity, this need to be moved to the 
-  // const [ingredientsQuantityList, setTngredientsQuantityList] = useState<ProductForm[]>([])
+  const { quantity, ingredientId } = newFormProduct;
 
   //Here I store my Ingredients
   const [ingredientsList, setIngredientsList] = useState<TIngredient[]>([]);
 
-  //Here I deconstruct the product object
-  const {quantity, ingredientId } = newFormProduct;
+  //useReducer
+  const MainProductIngredientList= [] as ProductIngredientsState[]
 
+  const [ProductIngredientState, pIDispatch] = useReducer(ProductIngredientsReducer, MainProductIngredientList)
   //Getting Ingredients when Loading the page
   useEffect(() => {
-    console.log("Using UseEffect to get Ingredients")
+    console.log("Using UseEffect to get Ingredients");
     const ingredientsHandler = async () => {
       const ingredientsFetcher = await fetcher("/api/ingredients");
       setIngredientsList(ingredientsFetcher);
     };
     ingredientsHandler();
   }, []);
-
+  //I have to still handle when the ingredient-quantity list is ready to be added to the ingredientsQuantityList
+  // I was doing this with the form, but now I have to send it in a different way
   // Handeling Form Submit
-  const newProductHandler = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+ 
+    // const changedIngredientsQuantity = [
+    //   ...ingredientsQuantityList,
+    //   newFormProduct,
+    // ];
 
-    const changedIngredientsQuantity=[
-        ...ingredientsQuantityList,
-        newFormProduct
-    ]
-
-    setTngredientsQuantityList(changedIngredientsQuantity)
+    // setTngredientsQuantityList(changedIngredientsQuantity);
 
     //IngredientsQuantity Payload
 
-    const newQuantityIngredient:IngredientsQuantityPayload = {
-      quantityOfIngredientsUsed:quantity,
+    const newQuantityIngredient: IngredientsQuantityPayload = {
+      quantityOfIngredientsUsed: quantity,
       ingredients: {
         connect: {
-          id: ingredientId
-        }
-      }
-    }
-    const changedIngredientsQuantityPayload=[
+          id: ingredientId,
+        },
+      },
+    };
+    const changedIngredientsQuantityPayload = [
       ...ingredientsQuantityPayload,
-      newQuantityIngredient
-  ]
+      newQuantityIngredient,
+    ];
 
-    setIngredientsQuantityPayload(changedIngredientsQuantityPayload)
-
-
-  }
+    setIngredientsQuantityPayload(changedIngredientsQuantityPayload);
 
   const onChangeHandler = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ): void => {
     const changedFormValues = {
       ...newFormProduct,
-      [event.target.name]: event.target.type==="number"? parseInt(event.target.value)  :event.target.value
+      [event.target.name]:
+        event.target.type === "number"
+          ? parseInt(event.target.value)
+          : event.target.value,
     };
     setNewFormProduct(changedFormValues);
   };
+
+  const removeHandler=(item:ProductIngredientsState)=>{
+    pIDispatch({type: 'remove',
+    IngredientId: item.ingredientId,
+    quantity:quantity})
+  }
+
+  const editHandler=()=>{
+    pIDispatch({type: 'edit',
+    IngredientId:ingredientId,
+    quantity: quantity})
+    //I COULD HANDLE IT HERE "SEE COMMENT FROM LINE 48"
+  }
+
+  const addHandler=()=>{
+    pIDispatch({type: 'add',
+    IngredientId: ingredientId,
+    quantity: quantity})
+  }
   return (
     <div>
-        <div>
-            List of Ingredients and Quantity selectedL:
-            {ingredientsQuantityList.length!==0?
-            <ul>
-                {ingredientsQuantityList.map(item=>(
-                  // Eventually I need to show the ingredients name and not the id
-                    <li key={item.ingredientId}>Ingredient id:{item.ingredientId} Quantity used:{item.quantity}</li>
-                )
-                )}
-            </ul>
-            :
-
-            <p>No ingredients selected yet</p>}
-        </div>
-      <form onSubmit={newProductHandler}>
-       
-        <label >
-            Quantity:
-        <input
-          name="quantity"
-          type="number"
-          value={quantity}
-          onChange={onChangeHandler}
+      <div>
+        List of Ingredients and Quantity selected:
+        {ProductIngredientState.length !== 0 ? (
+          <ul>
+            {ProductIngredientState.map((item) => (
+              // Eventually I need to show the ingredients name and not the id
+              // This issue 
+              <li key={item.ingredientId}>
+                Ingredient id:{item.ingredientId} Quantity used:{item.quantity}
+                <button onClick={()=> removeHandler(item)}>Remove</button>
+                <button onClick={()=> editHandler()}>Edit</button>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No ingredients selected yet</p>
+        )}
+      </div>
+      <div >
+        <label>
+          Quantity:
+          <input
+            name="quantity"
+            type="number"
+            value={quantity}
+            onChange={onChangeHandler}
           ></input>
-          </label>
+        </label>
         <br />
 
         <select
-        name="ingredientId"
-        value={ingredientId}
+          name="ingredientId"
+          value={ingredientId}
           onChange={onChangeHandler}
         >
           {ingredientsList.map((ingredient) => (
-            <option key = {ingredient.id} value={ingredient.id}>{ingredient.name}</option>
+            <option key={ingredient.id} value={ingredient.id}>
+              {ingredient.name}
+            </option>
           ))}
         </select>
         <br />
-        <button>Add new Ingredient</button>
-      </form>
+        <button onClick={()=>addHandler()}>Add new Ingredient</button>
+      </div>
     </div>
   );
 };
 
-export default ProductIngredients
+export default ProductIngredients;
